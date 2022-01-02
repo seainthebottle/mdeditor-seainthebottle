@@ -87,6 +87,7 @@ const rgMdEditor = function () {
       });
     });
   };
+  
   this.selectInitializedEditor = function (id) {
     if ($(id).find(".rg_mde_wrap")) {
       this.id = id;
@@ -94,6 +95,8 @@ const rgMdEditor = function () {
       console.error("MdEditor has not been initialized.");
     }
   };
+
+  // render current markdown text to preview window as html format
   this.renderMarkdownData = function () {
     let preview = this.id + " .rg_mde_preview";
 
@@ -103,22 +106,29 @@ const rgMdEditor = function () {
     let result = HtmlSanitizer.SanitizeHtml(md.render(this.getMarkdownText()));
     diff.changeDiff(diff.stringToHTML(result), document.querySelector(preview));
   };
+
   this.addPreviewClass = function (classname) {
     let preview = this.id + " .rg_mde_preview";
     $(preview).addClass(classname);
   };
+
   this.getHtmlText = function () {
     let html = this.id + " .rg_mde_preview";
     return $(html).html();
   };
+
+  // get whole markdown text from the simple editor
   this.getMarkdownText = function () {
     let code = this.id + " .rg_mde_code";
     return $(code).val();
   };
+
+  // put markdown text into the simple editor at cursor position
   this.putText = function (data) {
     let code = this.id + " .rg_mde_code";
     this.insertAtCursor(code, data);
   };
+
   this.getSelectedTxt = function (el) {
     let txtarea = document.querySelector(el);
     let start = txtarea.selectionStart;
@@ -127,6 +137,7 @@ const rgMdEditor = function () {
 
     return sel;
   };
+
   this.setHeight = function (height) {
     let body = this.id + " .rg_mde_body";
     let code = this.id + " .rg_mde_body .markdown-code";
@@ -136,27 +147,26 @@ const rgMdEditor = function () {
     $(body).css("height", height);
     $(code).css("height", height);
   };
+
   this.getHeight = function () {
     return this.editorHeight;
   };
+
+  // insert text(myValue) into simple editor at cursor position
   this.insertAtCursor = function (el, myValue) {
     let myField = document.querySelector(el);
-    if (document.selection) {
-      myField.focus();
-      sel = document.selection.createRange();
-      sel.text = myValue;
-    } else if (myField.selectionStart || myField.selectionStart == "0") {
-      let startPos = myField.selectionStart;
-      let endPos = myField.selectionEnd;
-      myField.value =
-        myField.value.substring(0, startPos) +
-        myValue +
-        myField.value.substring(endPos, myField.value.length);
-    } else {
-      myField.value += myValue;
-    }
+
+    myField.focus();
+    let startPos = myField.selectionStart;
+    sel = document.selection.createRange();
+    sel.text = myValue;
+    // move cursor to end of pasted text
+    cursorpos = startPos + myValue.length;
+    myField.setSelectionRange(cursorpos, cursorpos);
+
     if (self.previewEnabled) self.renderMarkdownData();
   };
+
   this.changeContent = function (data) {
     let code = this.id + " .rg_mde_code";
     $(code).val(data);
