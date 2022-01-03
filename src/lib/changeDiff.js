@@ -35,6 +35,18 @@ const diff = {
     return node.textContent;
   },
   /**
+   * Stringfy attributes
+   * @param  {Node}   node The node
+   * @return {String}      The type
+   */
+  stringfyAttributes: (attributes) => {
+    let stringAttrs = "";
+    for(let count = 0; count < attributes.length; count++) {
+      stringAttrs += attributes[count].name + ":" + attributes[count].value + "|";
+    }
+    return stringAttrs;
+  },
+  /**
    * Compare the template to the UI and make updates
    * @param  {Node} template The template HTML
    * @param  {Node} elem     The UI HTML
@@ -80,13 +92,17 @@ const diff = {
         domNodes[index].textContent = templateContent;
       }
 
-      // If attributes are different, update it
+      // If attributes are different, replace it with new element
       let templateAttrs = node.attributes;
       if (
         templateAttrs &&
-        JSON.stringify(templateAttrs) !== JSON.stringify(domNodes[index].attributes)
+        diff.stringfyAttributes(templateAttrs) !== diff.stringfyAttributes(domNodes[index].attributes)
       ) {
-        domNodes[index].attributes = templateAttrs;
+          domNodes[index].parentNode.replaceChild(
+            node.cloneNode(true),
+            domNodes[index]
+          );
+          return;
       }
 
       // If target element should be empty, wipe it
