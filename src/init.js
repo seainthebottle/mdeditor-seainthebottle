@@ -57,11 +57,13 @@ const rgMdEditor = function () {
         let output = replaced.replace("{$1}", selected_txt);
         self.insertAtCursor(code, output);
       });
+
       $(el_preview).click(function () {
         let d = $(preview_parent).css("display");
         if (d == "none") {
           $(preview_parent).show();
           $(editor_body).css("height", "auto");
+
           self.renderMarkdownData();
           self.previewEnabled = true;
         } else if (d == "block") {
@@ -75,6 +77,7 @@ const rgMdEditor = function () {
       $(code).bind("keyup mouseup", function () {
         if (self.previewEnabled) self.renderMarkdownData();
       });
+
       $(code).on("keydown", function () {
         if (event.keyCode === 9) {
           let v = this.value,
@@ -155,13 +158,17 @@ const rgMdEditor = function () {
   // insert text(myValue) into simple editor at cursor position
   this.insertAtCursor = function (el, myValue) {
     let myField = document.querySelector(el);
-
     myField.focus();
     let startPos = myField.selectionStart;
-    sel = document.selection.createRange();
-    sel.text = myValue;
+    let endPos = myField.selectionEnd;
+    let preText = myField.value;
+    myField.value =
+      preText.substring(0, startPos) +
+      myValue +
+      preText.substring(endPos, preText.length);
+     
     // move cursor to end of pasted text
-    cursorpos = startPos + myValue.length;
+    let cursorpos = startPos + myValue.length;
     myField.setSelectionRange(cursorpos, cursorpos);
 
     if (self.previewEnabled) self.renderMarkdownData();

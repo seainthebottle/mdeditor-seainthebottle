@@ -1,6 +1,7 @@
 /**
  * Dom diffing library
  * https://gomakethings.com/dom-diffing-with-vanilla-js/
+ * Revised by seainthebottle
  */
 
 const diff = {
@@ -77,6 +78,15 @@ const diff = {
         templateContent !== diff.getNodeContent(domNodes[index])
       ) {
         domNodes[index].textContent = templateContent;
+      }
+
+      // If attributes are different, update it
+      let templateAttrs = node.attributes;
+      if (
+        templateAttrs &&
+        JSON.stringify(templateAttrs) !== JSON.stringify(domNodes[index].attributes)
+      ) {
+        domNodes[index].attributes = templateAttrs;
       }
 
       // If target element should be empty, wipe it
