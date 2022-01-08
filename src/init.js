@@ -99,6 +99,14 @@ const rgMdEditor = function () {
     }
   };
 
+  this.encodeReplacer = function (match, p1, p2, p3, p4, offset, string) {
+    return encodeURI(match);
+  }
+
+  this.decodeReplacer = function (match, p1, p2, p3, p4, offset, string) {
+    return decodeURI(match);
+  }
+
   // render current markdown text to preview window as html format
   this.renderMarkdownData = function () {
     let preview = this.id + " .rg_mde_preview";
@@ -106,8 +114,24 @@ const rgMdEditor = function () {
     let md = MarkdownIt({
       html: true,
     });
-    let result = HtmlSanitizer.SanitizeHtml(md.render(this.getMarkdownText()));
-    diff.changeDiff(diff.stringToHTML(result), document.querySelector(preview));
+
+    let unescapedMarkdownText = this.getMarkdownText();
+
+    // encodes LaTex text into URI
+    // \$는 따로 escape 해 준다.
+    unescapedMarkdownText = unescapedMarkdownText.replace("\\\$", '#36#X21kZV90b29sYmFyIj4');
+    var latexReg1 = /(\$\$)[\w\W]+?(\$\$)|(\\\[)[\w\W]+?(\\\])|(\\\()[\w\W]+?(\\\))|\$[\w\W]+?\$/gm;
+    let escapedMarkdownText = unescapedMarkdownText.replace(latexReg1, this.encodeReplacer);
+
+    let result = HtmlSanitizer.SanitizeHtml(md.render(escapedMarkdownText));
+    
+    // decode LaTex text from URI
+    var latexReg2 = /(\$\$)[\w\W]+?(\$\$)|(\%5C\%5B)[\w\W]+?(\%5C\%5D)|(\%5C\%28)[\w\W]+?(\%5C\%29)|(([^\\]\$)|(^\$))[\w\W]+?([^\\]\$)/gm;
+    let escapedLatexHtml = result;
+    let unescapedLatexHtml = escapedLatexHtml.replace(latexReg2, this.decodeReplacer);
+    unescapedLatexHtml = unescapedLatexHtml.replace('#36#X21kZV90b29sYmFyIj4', "\\\$");
+
+    diff.changeDiff(diff.stringToHTML(unescapedLatexHtml), document.querySelector(preview));
   };
 
   this.addPreviewClass = function (classname) {
