@@ -47,6 +47,26 @@ const diff = {
     return stringAttrs;
   },
   /**
+   * Compare attributes
+   * @param  {Node}   node1 The node
+   * @param  {Node}   node2 The node
+   * @return {Boolean}      True, if attributes of nodes are the same, Flase, elsewhere
+   */
+  compareAttributeNodes: (node1, node2) => {
+    let node1Attrs = node1.attributes;
+    let node2Attrs = node2.attributes;
+    if(node1Attrs == null && node2Attrs == null) return true;
+    if(node1Attrs == null || node2Attrs == null) return false;
+    
+    if (node1Attrs.length != node2Attrs.length) return false;
+
+    for(let count = 0; count < node1Attrs.length; count++) {
+      if((node1Attrs[count].name !== node2Attrs[count].name) ||
+        (node1Attrs[count].value !== node2Attrs[count].value)) return false;
+    }
+    return true;
+  },
+  /**
    * Compare the template to the UI and make updates
    * @param  {Node} template The template HTML
    * @param  {Node} elem     The UI HTML
@@ -93,11 +113,8 @@ const diff = {
       }
 
       // If attributes are different, replace it with new element
-      let templateAttrs = node.attributes;
-      if (
-        templateAttrs &&
-        diff.stringfyAttributes(templateAttrs) !== diff.stringfyAttributes(domNodes[index].attributes)
-      ) {
+      if(!diff.compareAttributeNodes(node, domNodes[index]))
+      {
           domNodes[index].parentNode.replaceChild(
             node.cloneNode(true),
             domNodes[index]
