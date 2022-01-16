@@ -1,7 +1,12 @@
 import $ from "jquery";
 import MarkdownIt from "markdown-it";
+import mdiFootNote_ from 'markdown-it-footnote';
+import mdiAbbr_ from 'markdown-it-abbr';
 import HtmlSanitizer from "./lib/htmlSanitizer";
 import diff from "./lib/changeDiff";
+
+export const mdiFootNote = mdiFootNote_;
+export const mdiAbbr = mdiAbbr_;
 
 const rgMdEditor = function () {
   this.id = null;
@@ -110,10 +115,13 @@ const rgMdEditor = function () {
   // render current markdown text to preview window as html format
   this.renderMarkdownData = function () {
     let preview = this.id + " .rg_mde_preview";
-
+    
     let md = MarkdownIt({
       html: true,
-    });
+      breaks: true,
+      linkify: true,
+      typographer: true,
+    }).use(mdiFootNote).use(mdiAbbr);
 
     let unescapedMarkdownText = this.getMarkdownText();
 
@@ -132,6 +140,9 @@ const rgMdEditor = function () {
     unescapedLatexHtml = unescapedLatexHtml.replace('#36#X21kZV90b29sYmFyIj4', "\\\$");
 
     diff.changeDiff(diff.stringToHTML(unescapedLatexHtml), document.querySelector(preview));
+
+    //let result = HtmlSanitizer.SanitizeHtml(md.render(this.getMarkdownText()));
+    //diff.changeDiff(diff.stringToHTML(result), document.querySelector(preview));
   };
 
   this.addPreviewClass = function (classname) {

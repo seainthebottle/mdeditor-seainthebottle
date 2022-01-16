@@ -48,6 +48,8 @@ const HtmlSanitizer = new (function () {
     S: true,
     DEL: true,
     SUP: true,
+    SUB: true,
+    SECTION: true,
   };
 
   let contentTagWhiteList_ = { FORM: true }; //tags that will be converted to DIVs
