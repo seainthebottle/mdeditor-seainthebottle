@@ -106,7 +106,7 @@ const rgMdEditor = function () {
 
   this.encodeReplacer = function (match, p1, p2, p3, p4, offset, string) {
     // replaces '<' into '< ' not to make this into html tags.
-    return encodeURI(match.replace("<", "< ")); 
+    return encodeURI(match.replace("<", "&lt;")); 
   }
 
   this.decodeReplacer = function (match, p1, p2, p3, p4, offset, string) {
