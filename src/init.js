@@ -133,7 +133,7 @@ const rgMdEditor = function () {
 
     let result = HtmlSanitizer.SanitizeHtml(md.render(escapedMarkdownText));
     
-    /* for testing 
+    /* for testing *
     var t = document.createElement("textarea");
     document.body.appendChild(t);
     t.value = result;
@@ -142,7 +142,7 @@ const rgMdEditor = function () {
     document.body.removeChild(t);*/
     
     // decode LaTex text from URI
-    var latexReg2 = /(\$\$)[\w\W]+?(\$\$)|(\%5C\%5B)[\w\W]+?(\%5C\%5D)|(\%5C\%28)[\w\W]+?(\%5C\%29)|(([^\\]\$)|(^\$))[\w\W]*?([^\\]\$)/gm;
+    var latexReg2 = /(\$\$)[\w\W]+?(\$\$)|(\%5C\%5B)[\w\W]+?(\%5C\%5D)|(\%5C\x28)[\w\W]+?(\%5C\x29)|(([^\\]\$)|(^\$))[\w\W]*?([^\\]\$)/gm;
     let escapedLatexHtml = result;
     let unescapedLatexHtml = escapedLatexHtml.replace(latexReg2, this.decodeReplacer);
     unescapedLatexHtml = unescapedLatexHtml.replace('#36#X21kZV90b29sYmFyIj4', "\\\$");
