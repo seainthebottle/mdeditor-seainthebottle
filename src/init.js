@@ -105,7 +105,8 @@ const rgMdEditor = function () {
   };
 
   this.encodeReplacer = function (match, p1, p2, p3, p4, offset, string) {
-    return encodeURI(match);
+    // replaces '<' into '< ' not to make this into html tags.
+    return encodeURI(match.replace("<", "< ")); 
   }
 
   this.decodeReplacer = function (match, p1, p2, p3, p4, offset, string) {
@@ -133,7 +134,7 @@ const rgMdEditor = function () {
 
     let result = HtmlSanitizer.SanitizeHtml(md.render(escapedMarkdownText));
     
-    /* for testing *
+    /*for testing *
     var t = document.createElement("textarea");
     document.body.appendChild(t);
     t.value = result;
