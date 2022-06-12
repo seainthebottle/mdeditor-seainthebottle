@@ -1,6 +1,6 @@
 {
   "name": "rg-mdeditor-seainthebottle",
-  "version": "0.4",
+  "version": "0.4.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -15,11 +15,13 @@
     "babel-preset-env": "^1.7.0",
     "extract-text-webpack-plugin": "^3.0.2",
     "markdown-it": "^12.0.6",
-    "markdown-it-footnote": "^3.0.3",
     "markdown-it-abbr": "^1.0.4",
+    "markdown-it-footnote": "^3.0.3",
+    "markdown-it-mark": "^3.0.1",
     "webpack": "^5.37.1",
     "webpack-cli": "^4.7.0"
   },
   "dependencies": {
+    "markdown-it-mark": "^3.0.1"
   }
 }

@@ -28,6 +28,7 @@ const HtmlSanitizer = new (function () {
     IMG: true,
     LABEL: true,
     LI: true,
+    MARK: true,
     OL: true,
     P: true,
     PRE: true,

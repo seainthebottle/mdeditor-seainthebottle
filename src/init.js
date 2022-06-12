@@ -2,11 +2,13 @@ import $ from "jquery";
 import MarkdownIt from "markdown-it";
 import mdiFootNote_ from 'markdown-it-footnote';
 import mdiAbbr_ from 'markdown-it-abbr';
+import mdiMark_ from 'markdown-it-mark';
 import HtmlSanitizer from "./lib/htmlSanitizer";
 import diff from "./lib/changeDiff";
 
 export const mdiFootNote = mdiFootNote_;
 export const mdiAbbr = mdiAbbr_;
+export const mdiMark = mdiMark_;
 
 const rgMdEditor = function () {
   this.id = null;
@@ -122,7 +124,7 @@ const rgMdEditor = function () {
       breaks: true,
       linkify: true,
       typographer: true,
-    }).use(mdiFootNote).use(mdiAbbr);
+    }).use(mdiFootNote).use(mdiAbbr).use(mdiMark);
 
     let unescapedMarkdownText = this.getMarkdownText();
 
@@ -150,7 +152,7 @@ const rgMdEditor = function () {
 
     diff.changeDiff(diff.stringToHTML(unescapedLatexHtml), document.querySelector(preview));
     // 이후 MathJax.typeset()를 불러줘야 Latex이 반영된다.
-    MathJax.typeset();
+    if(typeof MathJax !== 'undefined') MathJax.typeset();
     
     // 원래 루틴은 아래와 같다.
     //let result = HtmlSanitizer.SanitizeHtml(md.render(this.getMarkdownText()));
