@@ -149,7 +149,10 @@ const rgMdEditor = function () {
     unescapedLatexHtml = unescapedLatexHtml.replace('#36#X21kZV90b29sYmFyIj4', "\\\$");
 
     diff.changeDiff(diff.stringToHTML(unescapedLatexHtml), document.querySelector(preview));
-
+    // 이후 MathJax.typeset()를 불러줘야 Latex이 반영된다.
+    MathJax.typeset();
+    
+    // 원래 루틴은 아래와 같다.
     //let result = HtmlSanitizer.SanitizeHtml(md.render(this.getMarkdownText()));
     //diff.changeDiff(diff.stringToHTML(result), document.querySelector(preview));
   };
