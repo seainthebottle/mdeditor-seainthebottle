@@ -67,7 +67,7 @@ const rgMdEditor = function () {
         self.insertAtCursor(code, output);
       });
 
-      // Preview 버튼이 눌러질 경우
+      // Preview 버튼이 눌러진 경우
       $(el_preview).on("click", function () {
         let d = $(preview_parent).css("display");
         if (d == "none") {
@@ -84,9 +84,19 @@ const rgMdEditor = function () {
         }
       });
 
-      // TODO: 편집창에서 마우스 클릭될 때 preview 위치도 조정해준다. 
-      $(code).on("click", function () {
-        
+      // 편집창에서 마우스 우클릭될 때 preview 위치도 조정해준다. 
+      $(code).on('contextmenu', function (e) {
+        e.preventDefault();
+      //$(code).on("click", function (e) {
+        // 현재 커서 위치의 텍스트 행 수를 구한다.
+        let antetext = this.value.substring(0, this.selectionStart);
+        let linenum = antetext.split('\n').length-1;
+        // 해당 행에 맞는 preview 위치로 preview 텍스트를 옮긴다.
+        let offset = $(`[data-source-line="${linenum}"]`).offset();
+        if(typeof offset !== 'undefined'){
+          let scrollval = offset.top + ($(".rg_mde_preview").scrollTop() - $(".rg_mde_preview").offset().top);
+          $(".rg_mde_preview").stop(true).animate({scrollTop : scrollval}, 100, "linear");
+        }
       });
 
       // 내용 수정이 되면 업데이트해준다.
