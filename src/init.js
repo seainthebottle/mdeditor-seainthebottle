@@ -5,10 +5,12 @@ import mdiAbbr_ from 'markdown-it-abbr';
 import mdiMark_ from 'markdown-it-mark';
 import HtmlSanitizer from "./lib/htmlSanitizer";
 import diff from "./lib/changeDiff";
+import markdown_it_inject_linenumbers from "./lib/markdown-it-inject-linenumbers";
 
 export const mdiFootNote = mdiFootNote_;
 export const mdiAbbr = mdiAbbr_;
 export const mdiMark = mdiMark_;
+export const mdiLine = markdown_it_inject_linenumbers;
 
 const rgMdEditor = function () {
   this.id = null;
@@ -124,7 +126,7 @@ const rgMdEditor = function () {
       breaks: true,
       linkify: true,
       typographer: true,
-    }).use(mdiFootNote).use(mdiAbbr).use(mdiMark);
+    }).use(mdiFootNote).use(mdiAbbr).use(mdiMark).use(mdiLine);
 
     let unescapedMarkdownText = this.getMarkdownText();
 

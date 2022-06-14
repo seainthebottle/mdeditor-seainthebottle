@@ -58,6 +58,7 @@ const HtmlSanitizer = new (function () {
   let attributeWhitelist_ = {
     class: true,
     id: true,
+    data_source_line: true,
     align: true,
     color: true,
     controls: true,
