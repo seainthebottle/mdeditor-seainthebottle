@@ -10,7 +10,6 @@ import markdown_it_inject_linenumbers from "./lib/markdown-it-inject-linenumbers
 export const mdiFootNote = mdiFootNote_;
 export const mdiAbbr = mdiAbbr_;
 export const mdiMark = mdiMark_;
-export const mdiLine = markdown_it_inject_linenumbers;
 
 const rgMdEditor = function () {
   this.id = null;
@@ -48,7 +47,8 @@ const rgMdEditor = function () {
     let input_buttons = [el_bold, el_italic, el_link, el_image];
 
     $(function () {
-      $(input_buttons.join(", ")).click(function () {
+      // 여러 기능 버튼이 눌려질 경우(현재는 버튼을 거의 없앰)
+      $(input_buttons.join(", ")).on("click", function () {
         let my_class = $(this).attr("class");
         my_class = my_class.replace("rg_mde_tb_", "");
         let replaced = input_forms[my_class];
@@ -67,7 +67,8 @@ const rgMdEditor = function () {
         self.insertAtCursor(code, output);
       });
 
-      $(el_preview).click(function () {
+      // Preview 버튼이 눌러질 경우
+      $(el_preview).on("click", function () {
         let d = $(preview_parent).css("display");
         if (d == "none") {
           $(preview_parent).show();
@@ -83,12 +84,21 @@ const rgMdEditor = function () {
         }
       });
 
-      $(code).bind("keyup mouseup", function () {
+      // TODO: 편집창에서 마우스 클릭될 때 preview 위치도 조정해준다. 
+      $(code).on("click", function () {
+        
+      });
+
+      // 내용 수정이 되면 업데이트해준다.
+      //$(code).bind("keyup mouseup", function () {
+      $(code).on("input paste", function () {
         if (self.previewEnabled) self.renderMarkdownData();
       });
 
-      $(code).on("keydown", function () {
-        if (event.keyCode === 9) {
+      // 탭키가 눌러지면 편집창을 벗어나지 않고 탭을 넣을 수 있도록 해 준다.
+      $(code).on("keydown", function (e) {
+        keyCode = e.key || e.keyCode;
+        if (keyCode === 9) {
           let v = this.value,
             s = this.selectionStart,
             e = this.selectionEnd;
@@ -126,7 +136,7 @@ const rgMdEditor = function () {
       breaks: true,
       linkify: true,
       typographer: true,
-    }).use(mdiFootNote).use(mdiAbbr).use(mdiMark).use(mdiLine);
+    }).use(mdiFootNote).use(mdiAbbr).use(mdiMark).use(markdown_it_inject_linenumbers);
 
     let unescapedMarkdownText = this.getMarkdownText();
 
