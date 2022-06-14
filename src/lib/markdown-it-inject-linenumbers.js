@@ -14,7 +14,7 @@ module.exports = function inject_linenumbers_plugin(md) {
     if (tokens[idx].map) {
       line = tokens[idx].map[0];
       tokens[idx].attrJoin('class', 'source-line');
-      tokens[idx].attrSet('data_source_line', String(line));
+      tokens[idx].attrSet('data-source-line', String(line));
     }
     return slf.renderToken(tokens, idx, options, env, slf);
   }
