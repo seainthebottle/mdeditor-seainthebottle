@@ -88,14 +88,25 @@ const rgMdEditor = function () {
       $(code).on('contextmenu', function (e) {
         e.preventDefault();
       //$(code).on("click", function (e) {
-        // 현재 커서 위치의 텍스트 행 수를 구한다.
-        let antetext = this.value.substring(0, this.selectionStart);
-        let linenum = antetext.split('\n').length-1;
-        // 해당 행에 맞는 preview 위치로 preview 텍스트를 옮긴다.
-        let offset = $(`[data-source-line="${linenum}"]`).offset();
-        if(typeof offset !== 'undefined'){
-          let scrollval = offset.top + ($(".rg_mde_preview").scrollTop() - $(".rg_mde_preview").offset().top);
+        // preview가 열려 있을 때만 조정한다.
+        if(self.previewEnabled) {
+          // 현재 커서 위치의 텍스트 행 수를 구한다.
+          let antetext = this.value.substring(0, this.selectionStart);
+          let linenum = antetext.split('\n').length-1;
+          // 해당 행에 맞는 preview 위치로 preview 텍스트를 옮긴다.
+          // preview에서 행번호가 정의되어 있는 줄까지 원본에서 올라가며 검색한다. (TODO: jQuery 노드 검색식을 좀 더 최적화해야 한다.)
+          let offset = $(`[data-source-line="${linenum}"]`).offset();
+          for(linenum = antetext.split('\n').length-1; 
+            (typeof offset === 'undefined') && (linenum > 0);
+            linenum --, offset = $(`[data-source-line="${linenum}"]`).offset());
+          // 첫번째 줄이 정의되어 있지 않다면 맨 앞으로 스크롤하고 그렇지 않으면 적절히 계산해서 스크롤한다.
+          let onethirdgap = $(".rg_mde_preview").outerHeight() / 3;
+          let scrollval = (typeof offset !== 'undefined')? 
+            (offset.top + ($(".rg_mde_preview").scrollTop() - $(".rg_mde_preview").offset().top) - onethirdgap) : 0;
+          if (scrollval < 0) scrollval = 0;
           $(".rg_mde_preview").stop(true).animate({scrollTop : scrollval}, 100, "linear");
+
+          // TODO: 선택 부위를 하이라이트한다.
         }
       });
 
@@ -107,7 +118,7 @@ const rgMdEditor = function () {
 
       // 탭키가 눌러지면 편집창을 벗어나지 않고 탭을 넣을 수 있도록 해 준다.
       $(code).on("keydown", function (e) {
-        keyCode = e.key || e.keyCode;
+        let keyCode = e.key || e.keyCode;
         if (keyCode === 9) {
           let v = this.value,
             s = this.selectionStart,
