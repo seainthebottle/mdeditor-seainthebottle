@@ -11,10 +11,13 @@ export const mdiFootNote = mdiFootNote_;
 export const mdiAbbr = mdiAbbr_;
 export const mdiMark = mdiMark_;
 
+
 const rgMdEditor = function () {
   this.id = null;
   this.height = "500px";
   this.previewEnabled = false;
+  this.onCtrl = false;
+
   this.init = function (id) {
     if (this.id) {
       console.error("This MdEditor has already been initialized.");
@@ -44,6 +47,47 @@ const rgMdEditor = function () {
       image: "![alt]({$1})",
     };
 
+    let togglePreview = function () {
+      let d = $(preview_parent).css("display");
+      if (d == "none") {
+        $(preview_parent).show();
+        $(editor_body).css("height", "auto");
+
+        self.renderMarkdownData();
+        self.previewEnabled = true;
+      } else if (d == "block") {
+        $(preview_parent).hide();
+        let height = self.getHeight();
+        $(editor_body).css("height", height);
+        self.previewEnabled = false;
+      }
+    };
+
+    let setPreviewPosition = function (value, selectionStart, animate = true) {
+      // 현재 커서 위치의 텍스트 행 수를 구한다.
+      let antetext = value.substring(0, selectionStart);
+      let linenum = antetext.split('\n').length - 1;
+
+      // 해당 행에 맞는 preview 위치로 preview 텍스트를 옮긴다.
+      // preview에서 행번호가 정의되어 있는 줄까지 원본에서 올라가며 검색한다. (TODO: jQuery 노드 검색식을 좀 더 최적화해야 한다.)
+      let offset = $(`[data-source-line="${linenum}"]`).offset();
+      for (linenum = antetext.split('\n').length - 1;
+        (typeof offset === 'undefined') && (linenum > 0); linenum--, offset = $(`[data-source-line="${linenum}"]`).offset());
+
+      // 첫번째 줄이 정의되어 있지 않다면 맨 앞으로 스크롤하고 그렇지 않으면 적절히 계산해서 스크롤한다.
+      let onethirdgap = $(".rg_mde_preview").outerHeight() / 3;
+      let scrollval = (typeof offset !== 'undefined') ?
+        (offset.top + ($(".rg_mde_preview").scrollTop() - $(".rg_mde_preview").offset().top) - onethirdgap) : 0;
+      if (scrollval < 0) scrollval = 0;
+      $(".rg_mde_preview").stop(true).animate({scrollTop: scrollval}, 100, "linear");
+
+      // 선택 부위를 하이라이트한다.
+      if(animate){
+        $(`[data-source-line="${linenum}"]`).animate({opacity:0.3}, 300); 
+        $(`[data-source-line="${linenum}"]`).animate({opacity:1}, 300); 
+      }
+    };
+
     let input_buttons = [el_bold, el_italic, el_link, el_image];
 
     $(function () {
@@ -68,46 +112,14 @@ const rgMdEditor = function () {
       });
 
       // Preview 버튼이 눌러진 경우
-      $(el_preview).on("click", function () {
-        let d = $(preview_parent).css("display");
-        if (d == "none") {
-          $(preview_parent).show();
-          $(editor_body).css("height", "auto");
-
-          self.renderMarkdownData();
-          self.previewEnabled = true;
-        } else if (d == "block") {
-          $(preview_parent).hide();
-          let height = self.getHeight();
-          $(editor_body).css("height", height);
-          self.previewEnabled = false;
-        }
-      });
+      $(el_preview).on("click", togglePreview);
 
       // 편집창에서 마우스 우클릭될 때 preview 위치도 조정해준다. 
       $(code).on('contextmenu', function (e) {
         e.preventDefault();
-      //$(code).on("click", function (e) {
+        //$(code).on("click", function (e) {
         // preview가 열려 있을 때만 조정한다.
-        if(self.previewEnabled) {
-          // 현재 커서 위치의 텍스트 행 수를 구한다.
-          let antetext = this.value.substring(0, this.selectionStart);
-          let linenum = antetext.split('\n').length-1;
-          // 해당 행에 맞는 preview 위치로 preview 텍스트를 옮긴다.
-          // preview에서 행번호가 정의되어 있는 줄까지 원본에서 올라가며 검색한다. (TODO: jQuery 노드 검색식을 좀 더 최적화해야 한다.)
-          let offset = $(`[data-source-line="${linenum}"]`).offset();
-          for(linenum = antetext.split('\n').length-1; 
-            (typeof offset === 'undefined') && (linenum > 0);
-            linenum --, offset = $(`[data-source-line="${linenum}"]`).offset());
-          // 첫번째 줄이 정의되어 있지 않다면 맨 앞으로 스크롤하고 그렇지 않으면 적절히 계산해서 스크롤한다.
-          let onethirdgap = $(".rg_mde_preview").outerHeight() / 3;
-          let scrollval = (typeof offset !== 'undefined')? 
-            (offset.top + ($(".rg_mde_preview").scrollTop() - $(".rg_mde_preview").offset().top) - onethirdgap) : 0;
-          if (scrollval < 0) scrollval = 0;
-          $(".rg_mde_preview").stop(true).animate({scrollTop : scrollval}, 100, "linear");
-
-          // TODO: 선택 부위를 하이라이트한다.
-        }
+        if (self.previewEnabled) setPreviewPosition(this.value, this.selectionStart);
       });
 
       // 내용 수정이 되면 업데이트해준다.
@@ -116,10 +128,12 @@ const rgMdEditor = function () {
         if (self.previewEnabled) self.renderMarkdownData();
       });
 
-      // 탭키가 눌러지면 편집창을 벗어나지 않고 탭을 넣을 수 있도록 해 준다.
+      // 각종 키 처리를 해 준다.
       $(code).on("keydown", function (e) {
         let keyCode = e.key || e.keyCode;
-        if (keyCode === 9) {
+        if (keyCode === 'Control') self.onCtrl = true;
+        // 탭키가 눌러지면 편집창을 벗어나지 않고 탭을 넣을 수 있도록 해 준다.
+        else if (keyCode === 'Tab') {
           let v = this.value,
             s = this.selectionStart,
             e = this.selectionEnd;
@@ -127,10 +141,22 @@ const rgMdEditor = function () {
           this.selectionStart = this.selectionEnd = s + 1;
           return false;
         }
+        // Ctrl+`의 경우 preview를 토글한다.
+        else if (keyCode === '`' && self.onCtrl) {
+          togglePreview();
+          if (self.previewEnabled) setPreviewPosition(this.value, this.selectionStart, false);
+        }
       });
+
+      // 단축키 처리를 위해
+      $(code).on("keyup", function (e) {
+        let keyCode = e.key || e.keyCode;
+        if (keyCode === 'Control') self.onCtrl = false;
+      });
+
     });
   };
-  
+
   this.selectInitializedEditor = function (id) {
     if ($(id).find(".rg_mde_wrap")) {
       this.id = id;
@@ -141,7 +167,7 @@ const rgMdEditor = function () {
 
   this.encodeReplacer = function (match, p1, p2, p3, p4, offset, string) {
     // replaces '<' into '< ' not to make this into html tags.
-    return encodeURI(match.replace("<", "&lt;")); 
+    return encodeURI(match.replace("<", "&lt;"));
   }
 
   this.decodeReplacer = function (match, p1, p2, p3, p4, offset, string) {
@@ -151,7 +177,7 @@ const rgMdEditor = function () {
   // render current markdown text to preview window as html format
   this.renderMarkdownData = function () {
     let preview = this.id + " .rg_mde_preview";
-    
+
     let md = MarkdownIt({
       html: true,
       breaks: true,
@@ -168,7 +194,7 @@ const rgMdEditor = function () {
     let escapedMarkdownText = unescapedMarkdownText.replace(latexReg1, this.encodeReplacer);
 
     let result = HtmlSanitizer.SanitizeHtml(md.render(escapedMarkdownText));
-    
+
     /*for testing *
     var t = document.createElement("textarea");
     document.body.appendChild(t);
@@ -176,7 +202,7 @@ const rgMdEditor = function () {
     t.select();
     document.execCommand('copy');
     document.body.removeChild(t);*/
-    
+
     // decode LaTex text from URI
     var latexReg2 = /(\$\$)[\w\W]+?(\$\$)|(\%5C\%5B)[\w\W]+?(\%5C\%5D)|(\%5C\x28)[\w\W]+?(\%5C\x29)|(([^\\]\$)|(^\$))[\w\W]*?([^\\]\$)/gm;
     let escapedLatexHtml = result;
@@ -185,8 +211,8 @@ const rgMdEditor = function () {
 
     diff.changeDiff(diff.stringToHTML(unescapedLatexHtml), document.querySelector(preview));
     // 이후 MathJax.typeset()를 불러줘야 Latex이 반영된다.
-    if(typeof MathJax !== 'undefined') MathJax.typeset();
-    
+    if (typeof MathJax !== 'undefined') MathJax.typeset();
+
     // 원래 루틴은 아래와 같다.
     //let result = HtmlSanitizer.SanitizeHtml(md.render(this.getMarkdownText()));
     //diff.changeDiff(diff.stringToHTML(result), document.querySelector(preview));
@@ -248,7 +274,7 @@ const rgMdEditor = function () {
       preText.substring(0, startPos) +
       myValue +
       preText.substring(endPos, preText.length);
-     
+
     // move cursor to end of pasted text
     let cursorpos = startPos + myValue.length;
     myField.setSelectionRange(cursorpos, cursorpos);
