@@ -25,16 +25,21 @@ const rgMdEditor = function () {
     }
     this.id = id;
     let self = this;
-    let editor_body = this.id + " .rg_mde_body";
+    let mde_wrap = id + " .mde_wrap";
+    let mde_toolbar = id + " .mde_toolbar";
+    let editor_parent = id + " .mde_editor";
+    let editor_body = id + " .rg_mde_body";
     let preview_parent = id + " .mde_preview";
+    let mde_preview_title = id + " .preview-mode-title";
+    let preview_body = id + " .rg_mde_preview";
     let code = id + " .rg_mde_code";
 
-    let html_data = "PGRpdiBjbGFzcz0ibWRlX3dyYXAiPgogIDxkaXYgY2xhc3M9Im1kZV9lZGl0b3IiPgogICAgPGRpdiBjbGFzcz0icmdfbWRlX3Rvb2xiYXIiPgogICAgICA8dWw+CiAgICAgICAgPGxpPjxidXR0b24gdHlwZT0iYnV0dG9uIiBjbGFzcz0icmdfbWRlX3RiX3ByZXZpZXciPlByZXZpZXc8L2J1dHRvbj48L2xpPgogICAgICA8L3VsPgogICAgPC9kaXY+CiAgICA8ZGl2IGNsYXNzPSJyZ19tZGVfYm9keSI+CiAgICAgIDxkaXYgY2xhc3M9Im1hcmtkb3duLWNvZGUiPgogICAgICAgIDx0ZXh0YXJlYSBjbGFzcz0icmdfbWRlX2NvZGUiPjwvdGV4dGFyZWE+CiAgICAgIDwvZGl2PgogICAgPC9kaXY+CiAgPC9kaXY+CiAgPGRpdiBjbGFzcz0ibWRlX3ByZXZpZXciPgogICAgPGRpdiBjbGFzcz0icHJldmlldy1tb2RlLXRpdGxlIj5QcmV2aWV3IHNjcmVlbjwvZGl2PgogICAgPGRpdiBjbGFzcz0icmdfbWRlX3ByZXZpZXciPjwvZGl2PgogIDwvZGl2Pgo8L2Rpdj4=";
+    let html_data = "PGRpdiBjbGFzcz0ibWRlX3dyYXAiPgogICAgPGRpdiBjbGFzcz0ibWRlX3Rvb2xiYXIiPgogICAgICAgIDx1bD4KICAgICAgICAgICAgPGxpPjxidXR0b24gdHlwZT0iYnV0dG9uIiBjbGFzcz0icmdfbWRlX3RiX3ByZXZpZXciPlByZXZpZXc8L2J1dHRvbj48L2xpPgogICAgICAgIDwvdWw+CiAgICA8L2Rpdj4KICAgIDxkaXYgY2xhc3M9Im1kZV9lZGl0b3IiPgogICAgICAgIDxkaXYgY2xhc3M9InJnX21kZV9ib2R5Ij4KICAgICAgICAgICAgPGRpdiBjbGFzcz0ibWFya2Rvd24tY29kZSI+CiAgICAgICAgICAgICAgICA8dGV4dGFyZWEgY2xhc3M9InJnX21kZV9jb2RlIj48L3RleHRhcmVhPgogICAgICAgICAgICA8L2Rpdj4KICAgICAgICA8L2Rpdj4KICAgIDwvZGl2PgogICAgPGRpdiBjbGFzcz0ibWRlX3ByZXZpZXciPgogICAgICAgIDxkaXYgY2xhc3M9InByZXZpZXctbW9kZS10aXRsZSI+UHJldmlldyBzY3JlZW48L2Rpdj4KICAgICAgICA8ZGl2IGNsYXNzPSJyZ19tZGVfcHJldmlldyI+PC9kaXY+CiAgICA8L2Rpdj4KPC9kaXY+";
     let tpl = window.atob(html_data);
     $(id).html(tpl);
     $(preview_parent).hide();
 
-   let el_bold = id + " .rg_mde_tb_bold";
+    let el_bold = id + " .rg_mde_tb_bold";
     let el_italic = id + " .rg_mde_tb_italic";
     let el_link = id + " .rg_mde_tb_link";
     let el_image = id + " .rg_mde_tb_image";
@@ -48,18 +53,55 @@ const rgMdEditor = function () {
     };
 
     let togglePreview = function () {
-      let d = $(preview_parent).css("display");
-      if (d == "none") {
+      let preview_display = $(preview_parent).css("display");
+      let preview_float = $(preview_parent).css("float");
+      if (preview_display == "none") {
+        console.log("-50%", preview_display, preview_float);
+        $(editor_parent).css("width", "50%");
+        $(editor_parent).css("float", "left");
+        $(editor_parent).css("height", "auto");
         $(preview_parent).show();
-        $(editor_body).css("height", "auto");
+        $(mde_preview_title).hide();
+        $(preview_parent).css("width", "50%");
+        $(preview_parent).css("float", "right");
+        $(preview_parent).css("height", $(editor_parent).css("height"));
+        $(preview_body).css("height", $(editor_body).css("height"));
+    
+        $(mde_wrap).css("height", $(mde_toolbar).height() + $(editor_parent).height() + 2);
 
         self.renderMarkdownData();
         self.previewEnabled = true;
-      } else if (d == "block") {
+        console.log("50%");
+      } else if (preview_display == "block" && preview_float == "right") {
+        console.log("-100%", preview_display, preview_float);
+        $(editor_parent).css("width", "100%");
+        $(editor_parent).css("float", "none");
+        $(editor_parent).css("height", "auto");
+        $(preview_parent).show();
+        $(mde_preview_title).show();
+        $(preview_parent).css("width", "100%");
+        $(preview_parent).css("float", "none");
+        $(preview_parent).css("height", "auto");
+        //$(preview_parent).css("height", $(editor_parent).css("height"));
+
+        $(mde_wrap).css("height", 
+          $(mde_toolbar).height() + $(editor_parent).height() + $(preview_parent).height() + 2);
+
+        self.renderMarkdownData();
+        self.previewEnabled = true;
+        console.log("100%");
+      } else {
+        console.log("-hide", preview_display, preview_float);
+        $(editor_parent).css("width", "100%");
         $(preview_parent).hide();
+
         let height = self.getHeight();
         $(editor_body).css("height", height);
+
+        $(mde_wrap).css("height", $(mde_toolbar).height() + $(editor_parent).height() + 2);
+
         self.previewEnabled = false;
+        console.log("hide");
       }
     };
 
