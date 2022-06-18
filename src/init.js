@@ -83,8 +83,8 @@ const rgMdEditor = function () {
 
       // 선택 부위를 하이라이트한다.
       if(animate){
-        $(`[data-source-line="${linenum}"]`).animate({opacity:0.3}, 300); 
-        $(`[data-source-line="${linenum}"]`).animate({opacity:1}, 300); 
+        $(`[data-source-line="${linenum}"]`).animate({opacity:0.4}, 400); 
+        $(`[data-source-line="${linenum}"]`).animate({opacity:1}, 400); 
       }
     };
 
@@ -117,6 +117,7 @@ const rgMdEditor = function () {
       // 편집창에서 마우스 우클릭될 때 preview 위치도 조정해준다. 
       //$(code).on('contextmenu', function (e) {
       //e.preventDefault();
+
       $(code).on("click", function (e) {
         // preview가 열려 있을 때만 조정한다.
         if (self.previewEnabled) setPreviewPosition(this.value, this.selectionStart);
