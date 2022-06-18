@@ -26,15 +26,15 @@ const rgMdEditor = function () {
     this.id = id;
     let self = this;
     let editor_body = this.id + " .rg_mde_body";
-    let preview_parent = id + " .markdown-data";
+    let preview_parent = id + " .mde_preview";
     let code = id + " .rg_mde_code";
-    let html_data =
-      "PGRpdiBjbGFzcz0icmdfbWRlX3dyYXAiPgogIDxkaXYgY2xhc3M9InJnX21kZV90b29sYmFyIj4KICAgIDx1bD4KICAgICAgPCEtLTxsaT48YnV0dG9uIHR5cGU9ImJ1dHRvbiIgY2xhc3M9InJnX21kZV90Yl9ib2xkIj48Yj5CPC9iPjwvYnV0dG9uPjwvbGk+CiAgICAgIDxsaT48YnV0dG9uIHR5cGU9ImJ1dHRvbiIgY2xhc3M9InJnX21kZV90Yl9pdGFsaWMiPjxpPmk8L2k+PC9idXR0b24+PC9saT4KICAgICAgPGxpPjxidXR0b24gdHlwZT0iYnV0dG9uIiBjbGFzcz0icmdfbWRlX3RiX2xpbmsiPjx1Pmxpbms8L3U+PC9idXR0b24+PC9saT4KICAgICAgPGxpPjxidXR0b24gdHlwZT0iYnV0dG9uIiBjbGFzcz0icmdfbWRlX3RiX2ltYWdlIj5pbWFnZTwvYnV0dG9uPjwvbGk+LS0+CiAgICAgIDxsaT48YnV0dG9uIHR5cGU9ImJ1dHRvbiIgY2xhc3M9InJnX21kZV90Yl9wcmV2aWV3Ij5QcmV2aWV3PC9idXR0b24+PC9saT4KICAgIDwvdWw+CiAgPC9kaXY+CiAgPGRpdiBjbGFzcz0icmdfbWRlX2JvZHkiPgogICAgPGRpdiBjbGFzcz0ibWFya2Rvd24tY29kZSI+CiAgICAgIDx0ZXh0YXJlYSBjbGFzcz0icmdfbWRlX2NvZGUiPjwvdGV4dGFyZWE+CiAgICA8L2Rpdj4KICAgIDxkaXYgY2xhc3M9Im1hcmtkb3duLWRhdGEiPgogICAgICA8cCBjbGFzcz0icHJldmlldy1tb2RlLXRpdGxlIj5QcmV2aWV3IE1vZGU8L3A+CiAgICAgIDxkaXYgY2xhc3M9InJnX21kZV9wcmV2aWV3Ij48L2Rpdj4KICAgIDwvZGl2PgogIDwvZGl2Pgo8L2Rpdj4=";
+
+    let html_data = "PGRpdiBjbGFzcz0ibWRlX3dyYXAiPgogIDxkaXYgY2xhc3M9Im1kZV9lZGl0b3IiPgogICAgPGRpdiBjbGFzcz0icmdfbWRlX3Rvb2xiYXIiPgogICAgICA8dWw+CiAgICAgICAgPGxpPjxidXR0b24gdHlwZT0iYnV0dG9uIiBjbGFzcz0icmdfbWRlX3RiX3ByZXZpZXciPlByZXZpZXc8L2J1dHRvbj48L2xpPgogICAgICA8L3VsPgogICAgPC9kaXY+CiAgICA8ZGl2IGNsYXNzPSJyZ19tZGVfYm9keSI+CiAgICAgIDxkaXYgY2xhc3M9Im1hcmtkb3duLWNvZGUiPgogICAgICAgIDx0ZXh0YXJlYSBjbGFzcz0icmdfbWRlX2NvZGUiPjwvdGV4dGFyZWE+CiAgICAgIDwvZGl2PgogICAgPC9kaXY+CiAgPC9kaXY+CiAgPGRpdiBjbGFzcz0ibWRlX3ByZXZpZXciPgogICAgPGRpdiBjbGFzcz0icHJldmlldy1tb2RlLXRpdGxlIj5QcmV2aWV3IHNjcmVlbjwvZGl2PgogICAgPGRpdiBjbGFzcz0icmdfbWRlX3ByZXZpZXciPjwvZGl2PgogIDwvZGl2Pgo8L2Rpdj4=";
     let tpl = window.atob(html_data);
     $(id).html(tpl);
     $(preview_parent).hide();
 
-    let el_bold = id + " .rg_mde_tb_bold";
+   let el_bold = id + " .rg_mde_tb_bold";
     let el_italic = id + " .rg_mde_tb_italic";
     let el_link = id + " .rg_mde_tb_link";
     let el_image = id + " .rg_mde_tb_image";
@@ -115,9 +115,9 @@ const rgMdEditor = function () {
       $(el_preview).on("click", togglePreview);
 
       // 편집창에서 마우스 우클릭될 때 preview 위치도 조정해준다. 
-      $(code).on('contextmenu', function (e) {
-        e.preventDefault();
-        //$(code).on("click", function (e) {
+      //$(code).on('contextmenu', function (e) {
+      //e.preventDefault();
+      $(code).on("click", function (e) {
         // preview가 열려 있을 때만 조정한다.
         if (self.previewEnabled) setPreviewPosition(this.value, this.selectionStart);
       });
@@ -158,7 +158,7 @@ const rgMdEditor = function () {
   };
 
   this.selectInitializedEditor = function (id) {
-    if ($(id).find(".rg_mde_wrap")) {
+    if ($(id).find(".mde_wrap")) {
       this.id = id;
     } else {
       console.error("MdEditor has not been initialized.");
