@@ -91,6 +91,12 @@ const RhymixMarkdownEditor = function () {
                             false
                         );
                 }
+                // Ctrl+s의 경우 임시저장한다.
+                else if (keyCode === "s" && self.onCtrl) {
+                    e.preventDefault();
+                    //doDocumentSave(global);
+                    //self.doDocumentSave(document.getElementsByClassName("board_write").item(0));
+                }
             });
 
             // 단축키 처리를 위해
@@ -100,6 +106,53 @@ const RhymixMarkdownEditor = function () {
             });
         });
     };
+
+    /* 게시글 저장 
+    this.doDocumentSave = function (obj) {
+        console.log("doDocumentSave");
+        var editor_sequence = obj.getAttribute('editor_sequence');
+        console.log(editor_sequence);
+        var prev_content = editorRelKeys[editor_sequence].content.value;
+        if (typeof (editor_sequence) != 'undefined' && editor_sequence && typeof (editorRelKeys) != 'undefined' && typeof (editorGetContent) == 'function') {
+            var content = editorGetContent(editor_sequence);
+            editorRelKeys[editor_sequence].content.value = content;
+        }
+
+        var params = {}, responses = ['error', 'message', 'document_srl'], elms = obj.elements, data = jQuery(obj).serializeArray();
+        jQuery.each(data, function (i, field) {
+            var val = jQuery.trim(field.value);
+            if (!val) return true;
+            if (/\[\]$/.test(field.name)) field.name = field.name.replace(/\[\]$/, '');
+            if (params[field.name]) params[field.name] += '|@|' + val;
+            else params[field.name] = field.value;
+        });
+
+        console.log(params, completeDocumentSave, responses, params, obj);
+
+        $.ajax({
+            url: '/',
+            type: 'POST',
+            data: {
+                module: 'document',
+                act: 'procDocumentTempSave',
+                module_srl: '386695',
+            },
+            dataType: 'json',
+            module_srl: '383517',
+            contentType: 'application/json'
+        })
+            .done(function (data) {
+                console.log("done", data);
+            })
+            .fail(function (xhr) {
+                console.log("fail", xhr);
+            });
+
+        //exec_xml('document', 'procDocumentTempSave', params, completeDocumentSave, responses, params);
+
+        editorRelKeys[editor_sequence].content.value = prev_content;
+        return false;
+    }*/
 
     this.togglePreview = function () {
         let id = this.id;
@@ -117,7 +170,6 @@ const RhymixMarkdownEditor = function () {
         let editor_height;
 
         if (preview_display == "none") {
-            console.log("half");
             editor_height = this.totalHeight - 30;
 
             $(mde_editor).css("width", "50%");
@@ -140,7 +192,6 @@ const RhymixMarkdownEditor = function () {
             this.renderMarkdownData();
             this.previewEnabled = true;
         } else if (preview_display == "block" && preview_float == "right") {
-            console.log("full");
             editor_height = (this.totalHeight - 60) / 2;
 
             $(mde_editor).css("width", "100%");
@@ -158,12 +209,10 @@ const RhymixMarkdownEditor = function () {
             $(mde_wrap).css("height",
                 $(mde_toolbar).height() + $(mde_editor).height() + $(mde_preview).height() + 4 // border에 따른 오차보정
             );
-            console.log("-full", $(mde_toolbar).height(), $(mde_editor).height(), $(mde_preview).height());
 
             this.renderMarkdownData();
             this.previewEnabled = true;
         } else {
-            console.log("hide");
             editor_height = this.totalHeight - 30;
 
             $(mde_preview).hide();
