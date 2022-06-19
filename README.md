@@ -1,4 +1,4 @@
-# rg-mdeditor-forked
+# Markdown editor module for rhymix
 
 ```
 # To load javascript modules
