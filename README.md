@@ -1,4 +1,4 @@
-# Markdown editor for rhymix
+# Markdown editor module for rhymix
 
 ```
 # To load javascript modules
