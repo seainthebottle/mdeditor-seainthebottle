@@ -6,7 +6,7 @@ module.exports = {
 
   output: {
     path: path.resolve("dist"),
-    filename: "rgmde-bundle.js",
+    filename: "mde-bundle.js",
   },
 
   externals: {

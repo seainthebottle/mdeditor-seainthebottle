@@ -1,5 +1,5 @@
 import mde from "./init";
 
-window.rgMdEditor = mde;
+window.RhymixMarkdownEditor = mde;
 
-export const rgMdEditor = mde;
+export const RhymixMarkdownEditor = mde;

@@ -1,6 +1,6 @@
 {
-  "name": "rg-mdeditor-seainthebottle",
-  "version": "0.4.2",
+  "name": "rhymix-markdown-editor-bundle",
+  "version": "0.5.0",
   "description": "",
   "main": "index.js",
   "scripts": {
