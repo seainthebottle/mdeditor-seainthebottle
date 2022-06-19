@@ -24,28 +24,24 @@ const rgMdEditor = function () {
         this.id = id;
         let self = this;
         let mde_preview = id + " .mde_preview";
-        let code = id + " .mde_code";
+        let mde_editor_textarea = id + " .mde_editor_textarea";
         let el_preview = id + " .mde_tb_preview";
 
         let html_data = '\
-        <div class="mde_wrap">\
-            <div class="mde_toolbar">\
-                <ul>\
-                    <li><button type="button" class="mde_tb_preview">Preview</button></li>\
-                </ul>\
-            </div>\
-            <div class="mde_editor">\
-                <div class="mde_body">\
-                    <div class="markdown-code">\
-                        <textarea class="mde_code"></textarea>\
-                    </div>\
+            <div class="mde_wrap">\
+                <div class="mde_toolbar">\
+                    <ul>\
+                        <li><button type="button" class="mde_tb_preview">Preview</button></li>\
+                    </ul>\
                 </div>\
-            </div>\
-            <div class="mde_preview">\
-                <div class="mde_preview_title">Preview screen</div>\
-                <div class="mde_preview_main"></div>\
-            </div>\
-        </div>';
+                <div class="mde_editor">\
+                    <textarea class="mde_editor_textarea"></textarea>\
+                </div>\
+                <div class="mde_preview">\
+                    <div class="mde_preview_title">Preview screen</div>\
+                    <div class="mde_preview_main"></div>\
+                </div>\
+            </div>';
         $(id).html(html_data);
         $(mde_preview).hide();
 
@@ -56,7 +52,7 @@ const rgMdEditor = function () {
             // 편집창에서 마우스 우클릭될 때 preview 위치도 조정해준다.
             //$(code).on('contextmenu', function (e) {
             //e.preventDefault();
-            $(code).on("click", function (e) {
+            $(mde_editor_textarea).on("click", function (e) {
                 // preview가 열려 있을 때만 조정한다.
                 if (self.previewEnabled)
                     self.setPreviewPosition(this.value, this.selectionStart);
@@ -64,12 +60,13 @@ const rgMdEditor = function () {
 
             // 내용 수정이 되면 업데이트해준다.
             //$(code).bind("keyup mouseup", function () {
-            $(code).on("input paste", function () {
+            $(mde_editor_textarea).on("input paste", function () {
                 if (self.previewEnabled) self.renderMarkdownData();
             });
 
             // 각종 키 처리를 해 준다.
-            $(code).on("keydown", function (e) {
+            $(mde_editor_textarea).on("keydown", function (e) {
+                console.log("key down");
                 let keyCode = e.key || e.keyCode;
                 if (keyCode === "Control") self.onCtrl = true;
                 // 탭키가 눌러지면 편집창을 벗어나지 않고 탭을 넣을 수 있도록 해 준다.
@@ -83,6 +80,7 @@ const rgMdEditor = function () {
                 }
                 // Ctrl+`의 경우 preview를 토글한다.
                 else if (keyCode === "`" && self.onCtrl) {
+                    console.log("toggle key on");
                     self.togglePreview();
                     if (self.previewEnabled)
                         self.setPreviewPosition(
@@ -94,7 +92,7 @@ const rgMdEditor = function () {
             });
 
             // 단축키 처리를 위해
-            $(code).on("keyup", function (e) {
+            $(mde_editor_textarea).on("keyup", function (e) {
                 let keyCode = e.key || e.keyCode;
                 if (keyCode === "Control") self.onCtrl = false;
             });
@@ -106,7 +104,7 @@ const rgMdEditor = function () {
         let mde_wrap = id + " .mde_wrap";
         let mde_toolbar = id + " .mde_toolbar";
         let mde_editor = id + " .mde_editor";
-        let mde_editor_body = id + " .mde_body";
+        let mde_editor_textarea = id + " .mde_editor_textarea"
         let mde_preview = id + " .mde_preview";
         let mde_preview_title = id + " .mde_preview_title";
         let mde_preview_main = id + " .mde_preview_main";
@@ -114,27 +112,30 @@ const rgMdEditor = function () {
         let preview_display = $(mde_preview).css("display");
         let preview_float = $(mde_preview).css("float");
         if (preview_display == "none") {
+            console.log("half");
             $(mde_editor).css("width", "50%");
             $(mde_editor).css("float", "left");
-            $(mde_editor).css("height", "auto");
+            $(mde_editor).css("height", $(mde_editor_textarea).css("height"));
             $(mde_preview).show();
             $(mde_preview_title).hide();
             $(mde_preview).css("width", "50%");
             $(mde_preview).css("float", "right");
             $(mde_preview).css("height", $(mde_editor).css("height"));
-            $(mde_preview_main).css("height", $(mde_editor_body).css("height"));
+            $(mde_preview_main).css("height", $(mde_editor_textarea).css("height"));
 
             $(mde_wrap).css(
                 "height",
-                $(mde_toolbar).height() + $(mde_editor).height() + 2
+                $(mde_toolbar).height() + $(mde_editor).height() + 4
+                // box-sizing:border-box 시 border 계산에서 height() 함수와 css("height")는 다른 값을 출력할 수 있다.
             );
 
             this.renderMarkdownData();
             this.previewEnabled = true;
         } else if (preview_display == "block" && preview_float == "right") {
+            console.log("full");
             $(mde_editor).css("width", "100%");
             $(mde_editor).css("float", "none");
-            $(mde_editor).css("height", "auto");
+            $(mde_editor).css("height", $(mde_editor_textarea).css("height"));
             $(mde_preview).show();
             $(mde_preview_title).show();
             $(mde_preview).css("width", "100%");
@@ -142,24 +143,23 @@ const rgMdEditor = function () {
             $(mde_preview).css("height", "auto");
             //$(mde_preview).css("height", $(mde_editor).css("height"));
 
-            $(mde_wrap).css(
-                "height",
-                $(mde_toolbar).height() +
-                $(mde_editor).height() +
-                $(mde_preview).height() +
-                2
+            $(mde_wrap).css("height",
+                $(mde_toolbar).height() + $(mde_editor).height() + $(mde_preview).height() + 4
             );
+            console.log("-full", $(mde_toolbar).height(), $(mde_editor).height(), $(mde_preview).height());
 
             this.renderMarkdownData();
             this.previewEnabled = true;
         } else {
+            console.log("hide");
             $(mde_preview).hide();
 
             let height = this.editorHeight;
-            $(mde_editor_body).css("height", height);
+            $(mde_editor_textarea).css("height", height);
+            $(mde_editor).css("height", $(mde_editor_textarea).css("height"));
 
             $(mde_wrap).css("height",
-                $(mde_toolbar).height() + $(mde_editor).height() + 2
+                $(mde_toolbar).height() + $(mde_editor).height() + 4
             );
 
             this.previewEnabled = false;
@@ -284,13 +284,13 @@ const rgMdEditor = function () {
 
     // get whole markdown text from the simple editor
     this.getMarkdownText = function () {
-        let code = this.id + " .mde_code";
+        let code = this.id + " .mde_editor_textarea";
         return $(code).val();
     };
 
     // put markdown text into the simple editor at cursor position
     this.putText = function (data) {
-        let code = this.id + " .mde_code";
+        let code = this.id + " .mde_editor_textarea";
         this.insertAtCursor(code, data);
     };
 
@@ -301,20 +301,6 @@ const rgMdEditor = function () {
         let sel = txtarea.value.substring(start, finish);
 
         return sel;
-    };
-
-    this.setHeight = function (height) {
-        let body = this.id + " .mde_body";
-        let code = this.id + " .mde_body .markdown-code";
-
-        this.editorHeight = height;
-
-        $(body).css("height", height);
-        $(code).css("height", height);
-    };
-
-    this.getHeight = function () {
-        return this.editorHeight;
     };
 
     // insert text(myValue) into simple editor at cursor position
@@ -337,9 +323,23 @@ const rgMdEditor = function () {
     };
 
     this.changeContent = function (data) {
-        let code = this.id + " .mde_code";
+        let code = this.id + " .mde_editor_textarea";
         $(code).val(data);
         if (this.previewEnabled) this.renderMarkdownData();
+    };
+
+    this.setHeight = function (height) {
+        let mde_editor = this.id + " .mde_editor";
+        let mde_editor_textarea = this.id + " .mde_editor_textarea";
+
+        this.editorHeight = height;
+
+        $(mde_editor).css("height", height);
+        $(mde_editor_textarea).css("height", height);
+    };
+
+    this.getHeight = function () {
+        return this.editorHeight;
     };
 };
 
