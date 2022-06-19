@@ -46,6 +46,7 @@ const rgMdEditor = function () {
         $(id).html(html_data);
         $(mde_preview).hide();
 
+        // 이벤트 처리를 해 준다.
         $(function () {
             // Preview 버튼이 눌러진 경우
             $(el_preview).on("click", function () { self.togglePreview(); });
@@ -56,7 +57,7 @@ const rgMdEditor = function () {
             $(mde_editor_textarea).on("click", function (e) {
                 // preview가 열려 있을 때만 조정한다.
                 if (self.previewEnabled)
-                    self.setPreviewPosition(this.value, this.selectionStart);
+                    self.setPreviewPosition(this.value, this.selectionStart, true, e.pageY);
             });
 
             // 내용 수정이 되면 업데이트해준다.
@@ -180,9 +181,11 @@ const rgMdEditor = function () {
     this.setPreviewPosition = function (
         value,
         selectionStart,
-        animate = true
+        animate = true,
+        pageY = -1
     ) {
         let id = this.id;
+        let mde_editor_textarea = id + " .mde_editor_textarea";
         let mde_preview_main = id + " .mde_preview_main";
 
         // 현재 커서 위치의 텍스트 행 수를 구한다.
@@ -192,6 +195,7 @@ const rgMdEditor = function () {
         // 해당 행에 맞는 preview 위치로 preview 텍스트를 옮긴다.
         // preview에서 행번호가 정의되어 있는 줄까지 원본에서 올라가며 검색한다. (TODO: jQuery 노드 검색식을 좀 더 최적화해야 한다.)
         let offset = $(`[data-source-line="${linenum}"]`).offset();
+        let height = $(`[data-source-line="${linenum}"]`).height();
         for (
             linenum = antetext.split("\n").length - 1;
             typeof offset === "undefined" && linenum > 0;
@@ -200,10 +204,12 @@ const rgMdEditor = function () {
         );
 
         // 첫번째 줄이 정의되어 있지 않다면 맨 앞으로 스크롤하고 그렇지 않으면 적절히 계산해서 스크롤한다.
-        let onethirdgap = $(mde_preview_main).outerHeight() / 3;
+        let scrollgap = (pageY == -1) ?
+            ($(mde_preview_main).outerHeight() / 3) :
+            (pageY - height / 2 - $(mde_editor_textarea).offset().top);
         let scrollval =
             typeof offset !== "undefined"
-                ? offset.top + ($(mde_preview_main).scrollTop() - $(mde_preview_main).offset().top) - onethirdgap
+                ? offset.top + ($(mde_preview_main).scrollTop() - $(mde_preview_main).offset().top) - scrollgap
                 : 0;
         if (scrollval < 0) scrollval = 0;
         $(mde_preview_main).stop(true).animate({ scrollTop: scrollval, }, 100, "linear");
