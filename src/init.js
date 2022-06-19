@@ -11,7 +11,7 @@ export const mdiFootNote = mdiFootNote_;
 export const mdiAbbr = mdiAbbr_;
 export const mdiMark = mdiMark_;
 
-const rgMdEditor = function () {
+const RhymixMarkdownEditor = function () {
     this.id = null;
     this.previewEnabled = false;
     this.onCtrl = false;
@@ -365,4 +365,4 @@ const rgMdEditor = function () {
     };
 };
 
-export default rgMdEditor;
+export default RhymixMarkdownEditor;
