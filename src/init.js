@@ -15,6 +15,7 @@ const rgMdEditor = function () {
     this.id = null;
     this.previewEnabled = false;
     this.onCtrl = false;
+    this.totalHeight = 600;
 
     this.init = function (id) {
         if (this.id) {
@@ -111,11 +112,17 @@ const rgMdEditor = function () {
 
         let preview_display = $(mde_preview).css("display");
         let preview_float = $(mde_preview).css("float");
+
+        let editor_height;
+
         if (preview_display == "none") {
             console.log("half");
+            editor_height = this.totalHeight - 30;
+
             $(mde_editor).css("width", "50%");
             $(mde_editor).css("float", "left");
-            $(mde_editor).css("height", $(mde_editor_textarea).css("height"));
+            $(mde_editor).css("height", editor_height);
+            $(mde_editor_textarea).css("height", editor_height);
             $(mde_preview).show();
             $(mde_preview_title).hide();
             $(mde_preview).css("width", "50%");
@@ -125,7 +132,7 @@ const rgMdEditor = function () {
 
             $(mde_wrap).css(
                 "height",
-                $(mde_toolbar).height() + $(mde_editor).height() + 4
+                $(mde_toolbar).height() + $(mde_editor).height() + 3 // border에 따른 오차보정
                 // box-sizing:border-box 시 border 계산에서 height() 함수와 css("height")는 다른 값을 출력할 수 있다.
             );
 
@@ -133,18 +140,22 @@ const rgMdEditor = function () {
             this.previewEnabled = true;
         } else if (preview_display == "block" && preview_float == "right") {
             console.log("full");
+            editor_height = (this.totalHeight - 60) / 2;
+
             $(mde_editor).css("width", "100%");
             $(mde_editor).css("float", "none");
-            $(mde_editor).css("height", $(mde_editor_textarea).css("height"));
+            $(mde_editor).css("height", editor_height);
+            $(mde_editor_textarea).css("height", editor_height);
             $(mde_preview).show();
             $(mde_preview_title).show();
             $(mde_preview).css("width", "100%");
             $(mde_preview).css("float", "none");
-            $(mde_preview).css("height", "auto");
+            $(mde_preview).css("height", editor_height + 30);
+            $(mde_preview_main).css("height", $(mde_editor_textarea).css("height"));
             //$(mde_preview).css("height", $(mde_editor).css("height"));
 
             $(mde_wrap).css("height",
-                $(mde_toolbar).height() + $(mde_editor).height() + $(mde_preview).height() + 4
+                $(mde_toolbar).height() + $(mde_editor).height() + $(mde_preview).height() + 4 // border에 따른 오차보정
             );
             console.log("-full", $(mde_toolbar).height(), $(mde_editor).height(), $(mde_preview).height());
 
@@ -152,14 +163,14 @@ const rgMdEditor = function () {
             this.previewEnabled = true;
         } else {
             console.log("hide");
-            $(mde_preview).hide();
+            editor_height = this.totalHeight - 30;
 
-            let height = this.editorHeight;
-            $(mde_editor_textarea).css("height", height);
-            $(mde_editor).css("height", $(mde_editor_textarea).css("height"));
+            $(mde_preview).hide();
+            $(mde_editor).css("height", editor_height);
+            $(mde_editor_textarea).css("height", editor_height);
 
             $(mde_wrap).css("height",
-                $(mde_toolbar).height() + $(mde_editor).height() + 4
+                $(mde_toolbar).height() + $(mde_editor).height() + 3 // border에 따른 오차보정
             );
 
             this.previewEnabled = false;
@@ -329,17 +340,22 @@ const rgMdEditor = function () {
     };
 
     this.setHeight = function (height) {
+        let mde_wrap = this.id + " .mde_wrap";
         let mde_editor = this.id + " .mde_editor";
         let mde_editor_textarea = this.id + " .mde_editor_textarea";
 
-        this.editorHeight = height;
+        $(mde_wrap).css("height", height);
 
-        $(mde_editor).css("height", height);
-        $(mde_editor_textarea).css("height", height);
+        this.totalHeight = $(mde_wrap).height();
+        let editorHeight = this.totalHeight - 30;
+        console.log("setHeight", this.totalHeight, editorHeight);
+
+        $(mde_editor).css("height", editorHeight);
+        $(mde_editor_textarea).css("height", editorHeight);
     };
 
     this.getHeight = function () {
-        return this.editorHeight;
+        return this.totalHeight;
     };
 };
 
