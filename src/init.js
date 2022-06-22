@@ -94,8 +94,12 @@ const RhymixMarkdownEditor = function () {
                 // Ctrl+s의 경우 임시저장한다.
                 else if (keyCode === "s" && self.onCtrl) {
                     e.preventDefault();
-                    //doDocumentSave(global);
-                    //self.doDocumentSave(document.getElementsByClassName("board_write").item(0));
+                    /*let obj = document.getElementsByClassName("board_write").item(0);
+                    obj.setAttribute("target", "#iframe_unseen");
+                    //$("form").submit();
+
+                    //doDocumentSave(this);
+                    //self.doDocumentSave(document.getElementsByClassName("board_write").item(0));*/
                 }
             });
 
