@@ -11,18 +11,20 @@ export const mdiFootNote = mdiFootNote_;
 export const mdiAbbr = mdiAbbr_;
 export const mdiMark = mdiMark_;
 
-const RhymixMarkdownEditor = function () {
+const MarkdownEditor = function () {
     this.id = null;
+    this.content_key = null;
     this.previewEnabled = false;
     this.onCtrl = false;
     this.totalHeight = 600;
 
-    this.init = function (id) {
+    this.init = function (id, content_key) {
         if (this.id) {
             console.error("This MdEditor has already been initialized.");
             return false;
         }
         this.id = id;
+        this.content_key = content_key;
         let self = this;
         let mde_preview = id + " .mde_preview";
         let mde_editor_textarea = id + " .mde_editor_textarea";
@@ -94,12 +96,26 @@ const RhymixMarkdownEditor = function () {
                 // Ctrl+s의 경우 임시저장한다.
                 else if (keyCode === "s" && self.onCtrl) {
                     e.preventDefault();
-                    /*let obj = document.getElementsByClassName("board_write").item(0);
-                    obj.setAttribute("target", "#iframe_unseen");
-                    //$("form").submit();
-
-                    //doDocumentSave(this);
-                    //self.doDocumentSave(document.getElementsByClassName("board_write").item(0));*/
+                    // 임시저장 이외에 일반저장도 구현하려면 modules/document/document.controller.php를 수정해야 한다.
+                    var content_key = self.content_key;
+                    var insert_form = $(this).closest("form");
+                    // 편집 textarea 내의 텍스트 내용
+                    var content_input = insert_form
+                        .find("input,textarea")
+                        .filter("[name=" + content_key + "]");
+                    var markdown_input = insert_form
+                        .find("input,textarea")
+                        .filter("[name=markdown_content]");
+                    // preview로 markdown 변환된 내용을 반영해 주고
+                    self.renderMarkdownData();
+                    // preview의 내용을 가져온다.
+                    var content_html = self.getHtmlText();
+                    content_input.val(content_html);
+                    // markdown text는 따로 가져온다.
+                    var content_md = self.getMarkdownText();
+                    markdown_input.val(content_md);
+                    console.log(content_key, "\n", content_html, "\n", content_md);
+                    doDocumentSave(this);
                 }
             });
 
@@ -113,8 +129,9 @@ const RhymixMarkdownEditor = function () {
 
     /* 게시글 저장 
     this.doDocumentSave = function (obj) {
-        console.log("doDocumentSave");
-        var editor_sequence = obj.getAttribute('editor_sequence');
+        // common/js/common.js의 소스를 가져와서 고쳤다.
+        // 더 내부적으로는 modules/document/document.controller.php
+        var editor_sequence = obj.form.getAttribute('editor_sequence');
         console.log(editor_sequence);
         var prev_content = editorRelKeys[editor_sequence].content.value;
         if (typeof (editor_sequence) != 'undefined' && editor_sequence && typeof (editorRelKeys) != 'undefined' && typeof (editorGetContent) == 'function') {
@@ -122,7 +139,7 @@ const RhymixMarkdownEditor = function () {
             editorRelKeys[editor_sequence].content.value = content;
         }
 
-        var params = {}, responses = ['error', 'message', 'document_srl'], elms = obj.elements, data = jQuery(obj).serializeArray();
+        var params = {}, responses = ['error', 'message', 'document_srl'], elms = obj.form.elements, data = jQuery(obj.form).serializeArray();
         jQuery.each(data, function (i, field) {
             var val = jQuery.trim(field.value);
             if (!val) return true;
@@ -133,26 +150,7 @@ const RhymixMarkdownEditor = function () {
 
         console.log(params, completeDocumentSave, responses, params, obj);
 
-        $.ajax({
-            url: '/',
-            type: 'POST',
-            data: {
-                module: 'document',
-                act: 'procDocumentTempSave',
-                module_srl: '386695',
-            },
-            dataType: 'json',
-            module_srl: '383517',
-            contentType: 'application/json'
-        })
-            .done(function (data) {
-                console.log("done", data);
-            })
-            .fail(function (xhr) {
-                console.log("fail", xhr);
-            });
-
-        //exec_xml('document', 'procDocumentTempSave', params, completeDocumentSave, responses, params);
+        exec_xml('document', 'procDocumentTempSave', params, completeDocumentSave, responses, params);
 
         editorRelKeys[editor_sequence].content.value = prev_content;
         return false;
@@ -418,4 +416,4 @@ const RhymixMarkdownEditor = function () {
     };
 };
 
-export default RhymixMarkdownEditor;
+export default MarkdownEditor;

@@ -1,6 +1,6 @@
 {
-  "name": "rhymix-markdown-editor-bundle",
-  "version": "0.5.0",
+  "name": "markdown-editor-bundle",
+  "version": "0.5.1",
   "description": "",
   "main": "index.js",
   "scripts": {

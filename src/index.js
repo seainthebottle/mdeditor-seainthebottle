@@ -1,5 +1,5 @@
 import mde from "./init";
 
-window.RhymixMarkdownEditor = mde;
+window.MarkdownEditor = mde;
 
-export const RhymixMarkdownEditor = mde;
+export const MarkdownEditor = mde;
